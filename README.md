@@ -6,7 +6,19 @@
 [![](https://img.shields.io/badge/COMMUNITY-FORUM-success?style=for-the-badge)](https://community.home-assistant.io)
 
 
-This integration allows to use [Google Cloud Speetch-to-Text](https://cloud.google.com/speech-to-text) in Home Assistant.
+This integration allows to use [Google Cloud Speech-to-Text](https://cloud.google.com/speech-to-text) in Home Assistant.
+
+## Install
+
+You can install this integration via [HACS](https://hacs.xyz/). Go to HACS / Integrations / Three-dots menu / Custom repositories
+and add:
+- Repository: `https://github.com/chatziko/ha-google-cloud-stt`
+- Category: Integration
+
+Then install the "Google Cloud Speech-To-Text" integration.
+
+
+## Configure
 
 To use it you need to configure a Google Cloud project, following the same instructions as the
 [Google Cloud Text-to-Speach](https://www.home-assistant.io/integrations/google_cloud) integration.
@@ -23,7 +35,7 @@ After enabling the integration, you can configure a [Voice Assistant](https://ww
 to use it by selecting `google_cloud_stt` in the "Speech-to-text" option.
 
 The supported languages are listed [here](https://cloud.google.com/speech-to-text/docs/speech-to-text-supported-languages).
-Note that V1 of Google Cloud Speetch-to-Text is used (V2 is still in preview and available in much fewer languages).
+Note that V1 of Google Cloud Speech-to-Text is used (V2 is still in preview and available in much fewer languages).
 The list of available models is avaiable [here](https://cloud.google.com/speech-to-text/docs/speech-to-text-requests#select-model). The default model
 is `command_and_search`, since it is available in most languages and should perform well in home automation tasks.
 
