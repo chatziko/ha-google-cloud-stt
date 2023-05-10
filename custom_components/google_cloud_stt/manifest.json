@@ -4,5 +4,6 @@
   "codeowners": ["@chatziko"],
   "documentation": "https://github.com/chatziko/ha-google-cloud-stt",
   "iot_class": "cloud_push",
+  "version": "0.1.0",
   "requirements": ["google-cloud-speech==2.19.0"]
 }
