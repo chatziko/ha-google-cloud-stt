@@ -6,7 +6,7 @@ import os
 from collections.abc import AsyncIterable
 
 import async_timeout
-from google.cloud import speech
+from google.cloud import speech     # Use speech v1. For the moment speech v2 is in preview and has fewer supported languages
 import voluptuous as vol
 
 from homeassistant.components.stt import (
@@ -206,12 +206,8 @@ class GoogleCloudSTTProvider(Provider):
         self.name = "Google Cloud STT"
 
         self._model = model
-
-        # Use speech v1. For the moment speech v2 is in preview and has fewer supported languages
-        if key_file:
-            self._client = speech.SpeechClient.from_service_account_json(key_file)
-        else:
-            self._client = speech.SpeechClient()
+        self._key_file = key_file
+        self._client = None
 
     @property
     def supported_languages(self) -> list[str]:
@@ -265,11 +261,19 @@ class GoogleCloudSTTProvider(Provider):
             model=self._model,
         )
 
+        def job():
+            # Create the client on first use, so that it is created inside the executor job
+            if self._client is None:
+                if self._key_file:
+                    self._client = speech.SpeechClient.from_service_account_json(self._key_file)
+                else:
+                    self._client = speech.SpeechClient()
+
+            return self._client.recognize(config=config, audio=audio)
+
         async with async_timeout.timeout(10):
             assert self.hass
-            response = await self.hass.async_add_executor_job(
-                lambda: self._client.recognize(config=config, audio=audio)
-            )
+            response = await self.hass.async_add_executor_job(job)
             if response.results and response.results[0].alternatives:
                 return SpeechResult(
                     response.results[0].alternatives[0].transcript,
