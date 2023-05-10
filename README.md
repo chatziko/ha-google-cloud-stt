@@ -1,6 +1,6 @@
 # Google Cloud Speech-To-Text for Home Assistant
 
-[![](https://img.shields.io/github/release/chatziko/ha-google-cloud-tts/all.svg?style=for-the-badge)](https://github.com/chatziko/ha-google-cloud-tts/releases)
+[![](https://img.shields.io/github/release/chatziko/ha-google-cloud-stt/all.svg?style=for-the-badge)](https://github.com/chatziko/ha-google-cloud-stt/releases)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![](https://img.shields.io/badge/MAINTAINER-%40chatziko-red?style=for-the-badge)](https://github.com/chatziko)
 [![](https://img.shields.io/badge/COMMUNITY-FORUM-success?style=for-the-badge)](https://community.home-assistant.io)
