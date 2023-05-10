@@ -1,0 +1,5 @@
+{
+  "name": "Google Cloud Speech-To-Text",
+  "homeassistant": "2023.1.0",
+  "render_readme": true
+}
