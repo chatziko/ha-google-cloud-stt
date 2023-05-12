@@ -25,7 +25,7 @@ To use it you need to configure a Google Cloud project, following the same instr
 Then place the JSON file with the API key you downloaded in the `config` folder, and add the following to your `configuration.yaml`:
 
 ```yaml
-tts:
+stt:
   - platform: google_cloud_stt
     key_file: googlecloud.json
     model: command_and_search
