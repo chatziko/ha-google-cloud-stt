@@ -40,3 +40,13 @@ The list of available models is avaiable [here](https://cloud.google.com/speech-
 is `command_and_search`, since it is available in most languages and should perform well in home automation tasks.
 
 
+## FAQ
+
+#### I get the following error in the Home Assistant system log
+
+  ```
+  The stt integration does not support any configuration parameters, got [{'platform': 'google_cloud_stt', 'key_file': 'google-cloud-service-googlecloud.json', 'model': 'command_and_search'}]. Please remove the configuration parameters from your configuration.
+  ```
+
+This is a known issue due to a [bug](https://github.com/home-assistant/core/issues/97161) in Home Assistant >= 2023.7. However, the reported message
+does __not__ affect the functionality of this integration, it should still work as expected (if properly configured).
