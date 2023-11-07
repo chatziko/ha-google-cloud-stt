@@ -1,9 +1,9 @@
 {
-  "domain": "google_cloud_stt",
-  "name": "Google Cloud Speech-To-Text",
-  "codeowners": ["@chatziko"],
-  "documentation": "https://github.com/chatziko/ha-google-cloud-stt",
+  "domain": "azure_stt",
+  "name": "Azure Speech-To-Text",
+  "codeowners": ["@chatziko & @Robert0309"],
+  "documentation": "https://github.com/Robert0309/ha-azure-stt",
   "iot_class": "cloud_push",
-  "version": "0.2.0",
-  "requirements": ["google-cloud-speech==2.19.0"]
+  "version": "0.0.1",
+  "requirements": ["azure-cognitiveservices-speech==1.32.1"]
 }

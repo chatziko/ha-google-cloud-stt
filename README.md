@@ -1,22 +1,21 @@
-# Google Cloud Speech-To-Text for Home Assistant
+# Azure Speech-To-Text for Home Assistant
 
 [![](https://img.shields.io/github/release/chatziko/ha-google-cloud-stt/all.svg?style=for-the-badge)](https://github.com/chatziko/ha-google-cloud-stt/releases)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![](https://img.shields.io/badge/MAINTAINER-%40chatziko-red?style=for-the-badge)](https://github.com/chatziko)
 [![](https://img.shields.io/badge/COMMUNITY-FORUM-success?style=for-the-badge)](https://community.home-assistant.io)
 
-
-This integration allows to use [Google Cloud Speech-to-Text](https://cloud.google.com/speech-to-text) in Home Assistant.
+This integration allows to use [Azure Speech-to-Text](https://azure.microsoft.com/en-us/products/ai-services/speech-to-text) in Home Assistant.
 
 ## Install
 
 You can install this integration via [HACS](https://hacs.xyz/). Go to HACS / Integrations / Three-dots menu / Custom repositories
 and add:
-- Repository: `https://github.com/chatziko/ha-google-cloud-stt`
+
+- Repository: `https://github.com/Robert0309/ha-azure-stt.git`
 - Category: Integration
 
-Then install the "Google Cloud Speech-To-Text" integration.
-
+Then install the "Azure Speech-To-Text" integration.
 
 ## Configure
 
@@ -39,14 +38,13 @@ Note that V1 of Google Cloud Speech-to-Text is used (V2 is still in preview and 
 The list of available models is avaiable [here](https://cloud.google.com/speech-to-text/docs/speech-to-text-requests#select-model). The default model
 is `command_and_search`, since it is available in most languages and should perform well in home automation tasks.
 
-
 ## FAQ
 
 #### I get the following error in the Home Assistant system log
 
-  ```
-  The stt integration does not support any configuration parameters, got [{'platform': 'google_cloud_stt', 'key_file': 'google-cloud-service-googlecloud.json', 'model': 'command_and_search'}]. Please remove the configuration parameters from your configuration.
-  ```
+```
+The stt integration does not support any configuration parameters, got [{'platform': 'google_cloud_stt', 'key_file': 'google-cloud-service-googlecloud.json', 'model': 'command_and_search'}]. Please remove the configuration parameters from your configuration.
+```
 
 This is a known issue due to a [bug](https://github.com/home-assistant/core/issues/97161) in Home Assistant >= 2023.7. However, the reported message
-does __not__ affect the functionality of this integration, it should still work as expected (if properly configured).
+does **not** affect the functionality of this integration, it should still work as expected (if properly configured).

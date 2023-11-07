@@ -4,9 +4,10 @@ from __future__ import annotations
 import logging
 import os
 from collections.abc import AsyncIterable
+import azure.cognitiveservices.speech as speechsdk
+from azure.cognitiveservices.speech.audio import PushAudioInputStream
 
 import async_timeout
-from google.cloud import speech     # Use speech v1. For the moment speech v2 is in preview and has fewer supported languages
 import voluptuous as vol
 
 from homeassistant.components.stt import (
@@ -24,189 +25,184 @@ import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
-DEFAULT_MODEL = "command_and_search"
+CONF_API_KEY = "api_key"
+CONF_REGION = "region"
 
-CONF_KEY_FILE = "key_file"
-CONF_MODEL = "model"
 
 SUPPORTED_LANGUAGES = [
     "af-ZA",
-    "sq-AL",
     "am-ET",
-    "ar-DZ",
+    "ar-AE",
     "ar-BH",
+    "ar-DZ",
     "ar-EG",
-    "ar-IQ",
     "ar-IL",
+    "ar-IQ",
     "ar-JO",
     "ar-KW",
     "ar-LB",
+    "ar-LY",
     "ar-MA",
     "ar-OM",
+    "ar-PS",
     "ar-QA",
     "ar-SA",
-    "ar-PS",
+    "ar-SY",
     "ar-TN",
-    "ar-AE",
     "ar-YE",
-    "hy-AM",
     "az-AZ",
-    "eu-ES",
-    "bn-BD",
+    "bg-BG",
     "bn-IN",
     "bs-BA",
-    "bg-BG",
-    "my-MM",
     "ca-ES",
-    "zh-CN",
-    "zh-TW",
-    "hr-HR",
     "cs-CZ",
+    "cy-GB",
     "da-DK",
-    "nl-BE",
-    "nl-NL",
+    "de-AT",
+    "de-CH",
+    "de-DE",
+    "el-GR",
     "en-AU",
     "en-CA",
+    "en-GB",
     "en-GH",
     "en-HK",
-    "en-IN",
     "en-IE",
+    "en-IN",
     "en-KE",
-    "en-NZ",
     "en-NG",
-    "en-PK",
+    "en-NZ",
     "en-PH",
     "en-SG",
-    "en-ZA",
     "en-TZ",
-    "en-GB",
     "en-US",
-    "et-EE",
-    "fil-PH",
-    "fi-FI",
-    "fr-BE",
-    "fr-CA",
-    "fr-FR",
-    "fr-CH",
-    "gl-ES",
-    "ka-GE",
-    "de-AT",
-    "de-DE",
-    "de-CH",
-    "el-GR",
-    "gu-IN",
-    "iw-IL",
-    "hi-IN",
-    "hu-HU",
-    "is-IS",
-    "id-ID",
-    "it-IT",
-    "it-CH",
-    "ja-JP",
-    "jv-ID",
-    "kn-IN",
-    "kk-KZ",
-    "km-KH",
-    "ko-KR",
-    "lo-LA",
-    "lv-LV",
-    "lt-LT",
-    "mk-MK",
-    "ms-MY",
-    "ml-IN",
-    "mr-IN",
-    "mn-MN",
-    "ne-NP",
-    "no-NO",
-    "fa-IR",
-    "pl-PL",
-    "pt-BR",
-    "pt-PT",
-    "ro-RO",
-    "ru-RU",
-    "sr-RS",
-    "si-LK",
-    "sk-SK",
-    "sl-SI",
+    "en-ZA",
     "es-AR",
     "es-BO",
     "es-CL",
     "es-CO",
     "es-CR",
+    "es-CU",
     "es-DO",
     "es-EC",
-    "es-SV",
+    "es-ES",
+    "es-GQ",
     "es-GT",
     "es-HN",
     "es-MX",
     "es-NI",
     "es-PA",
-    "es-PY",
     "es-PE",
     "es-PR",
-    "es-ES",
+    "es-PY",
+    "es-SV",
     "es-US",
     "es-UY",
     "es-VE",
-    "su-ID",
+    "et-EE",
+    "eu-ES",
+    "fa-IR",
+    "fi-FI",
+    "fil-PH",
+    "fr-BE",
+    "fr-CA",
+    "fr-CH",
+    "fr-FR",
+    "ga-IE",
+    "gl-ES",
+    "gu-IN",
+    "he-IL",
+    "hi-IN",
+    "hr-HR",
+    "hu-HU",
+    "hy-AM",
+    "id-ID",
+    "is-IS",
+    "it-CH",
+    "it-IT",
+    "ja-JP",
+    "jv-ID",
+    "ka-GE",
+    "kk-KZ",
+    "km-KH",
+    "kn-IN",
+    "ko-KR",
+    "lo-LA",
+    "lt-LT",
+    "lv-LV",
+    "mk-MK",
+    "ml-IN",
+    "mn-MN",
+    "mr-IN",
+    "ms-MY",
+    "mt-MT",
+    "my-MM",
+    "nb-NO",
+    "ne-NP",
+    "nl-BE",
+    "nl-NL",
+    "pa-IN",
+    "pl-PL",
+    "ps-AF",
+    "pt-BR",
+    "pt-PT",
+    "ro-RO",
+    "ru-RU",
+    "si-LK",
+    "sk-SK",
+    "sl-SI",
+    "so-SO",
+    "sq-AL",
+    "sr-RS",
+    "sv-SE",
     "sw-KE",
     "sw-TZ",
-    "sv-SE",
     "ta-IN",
-    "ta-MY",
-    "ta-SG",
-    "ta-LK",
     "te-IN",
     "th-TH",
     "tr-TR",
     "uk-UA",
     "ur-IN",
-    "ur-PK",
     "uz-UZ",
     "vi-VN",
+    "wuu-CN",
+    "yue-CN",
+    "zh-CN",
+    "zh-CN-shandong",
+    "zh-CN-sichuan",
+    "zh-HK",
+    "zh-TW",
     "zu-ZA",
 ]
 
-SUPPORTED_MODELS = [
-    "default",
-    "command_and_search",
-    "latest_short",
-    "latest_long",
-    "phone_call",
-    "video",
-]
-
-MODEL_SCHEMA = vol.In(SUPPORTED_MODELS)
 
 PLATFORM_SCHEMA = cv.PLATFORM_SCHEMA.extend(
     {
-        vol.Optional(CONF_KEY_FILE): cv.string,
-        vol.Optional(CONF_MODEL, default=DEFAULT_MODEL): MODEL_SCHEMA,
+        vol.Required(CONF_API_KEY): cv.string,
+        vol.Required(CONF_REGION): cv.string,
     }
 )
 
 
 async def async_get_engine(hass, config, discovery_info=None):
-    """Set up Google Cloud STT component."""
-    if key_file := config.get(CONF_KEY_FILE):
-        key_file = hass.config.path(key_file)
-        if not os.path.isfile(key_file):
-            _LOGGER.error("File %s doesn't exist", key_file)
-            return None
+    """Set up Azure STT component."""
+    api_key = config.get(CONF_API_KEY)
+    region = config.get(CONF_REGION)
 
-    return GoogleCloudSTTProvider(hass, key_file, config.get(CONF_MODEL))
+    return AzureSTTProvider(hass, api_key, region)
 
 
-class GoogleCloudSTTProvider(Provider):
-    """The Google Cloud STT API provider."""
+class AzureSTTProvider(Provider):
+    """The Azure STT API provider."""
 
-    def __init__(self, hass, key_file, model) -> None:
-        """Init Google Cloud STT service."""
+    def __init__(self, hass, api_key, region) -> None:
+        """Init Azure STT service."""
         self.hass = hass
-        self.name = "Google Cloud STT"
+        self.name = "Azure STT"
 
-        self._model = model
-        self._key_file = key_file
+
+        self._api_key = api_key
+        self._region = region
         self._client = None
 
     @property
@@ -243,40 +239,32 @@ class GoogleCloudSTTProvider(Provider):
         self, metadata: SpeechMetadata, stream: AsyncIterable[bytes]
     ) -> SpeechResult:
         # Collect data
-        audio_data = b""
+        audio_stream = PushAudioInputStream()
         async for chunk in stream:
-            audio_data += chunk
-
-        # """Process an audio stream to STT service."""
-        audio = speech.RecognitionAudio(content=audio_data)
-        encoding = (
-            speech.RecognitionConfig.AudioEncoding.OGG_OPUS
-            if metadata.codec == AudioCodecs.OPUS
-            else speech.RecognitionConfig.AudioEncoding.LINEAR16
-        )
-        config = speech.RecognitionConfig(
-            language_code=metadata.language,
-            encoding=encoding,
-            sample_rate_hertz=metadata.sample_rate,
-            model=self._model,
+            audio_stream.write(chunk)
+        
+        audio_config = speechsdk.audio.AudioConfig(stream=audio_stream)
+        speech_config  = speechsdk.SpeechConfig(
+            subscription=self._api_key,
+            region=self._region,
+            speech_recognition_language=metadata.language
         )
 
         def job():
             # Create the client on first use, so that it is created inside the executor job
             if self._client is None:
-                if self._key_file:
-                    self._client = speech.SpeechClient.from_service_account_json(self._key_file)
-                else:
-                    self._client = speech.SpeechClient()
+                self._client = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
 
-            return self._client.recognize(config=config, audio=audio)
+            return self._client.recognize_once_async().get()
 
-        async with async_timeout.timeout(10):
+        async with async_timeout.timeout(15):
             assert self.hass
             response = await self.hass.async_add_executor_job(job)
-            if response.results and response.results[0].alternatives:
+            
+            if response.reason == speechsdk.ResultReason.RecognizedSpeech:
                 return SpeechResult(
-                    response.results[0].alternatives[0].transcript,
+                    response.text,
                     SpeechResultState.SUCCESS,
                 )
-            return SpeechResult("", SpeechResultState.ERROR)
+            else:
+                return SpeechResult("",SpeechResultState.ERROR)
