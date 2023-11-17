@@ -35,7 +35,7 @@ After enabling the integration, you can configure a [Voice Assistant](https://ww
 to use it by selecting `google_cloud_stt` in the "Speech-to-text" option.
 
 The supported languages are listed [here](https://cloud.google.com/speech-to-text/docs/speech-to-text-supported-languages).
-Note that V1 of Google Cloud Speech-to-Text is used (V2 is still in preview and available in much fewer languages).
+Note that V1 of Google Cloud Speech-to-Text is used (it is available in more languages and has a free tier).
 The list of available models is avaiable [here](https://cloud.google.com/speech-to-text/docs/speech-to-text-requests#select-model). The default model
 is `command_and_search`, since it is available in most languages and should perform well in home automation tasks.
 
@@ -50,3 +50,11 @@ is `command_and_search`, since it is available in most languages and should perf
 
 This is a known issue due to a [bug](https://github.com/home-assistant/core/issues/97161) in Home Assistant >= 2023.7. However, the reported message
 does __not__ affect the functionality of this integration, it should still work as expected (if properly configured).
+
+#### How much does it cost to use Google Cloud Speech-To-Text?
+
+At the time of writing the pricing of Google Cloud Speech-to-Text V1 is:
+- Free for the first 60 minutes / month.
+- $0.024 / minute after the first 60 minutes/month.
+
+Check Google's [pricing table](https://cloud.google.com/speech-to-text/pricing#pricing_table) for up-to-date information.
