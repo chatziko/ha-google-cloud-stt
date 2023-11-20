@@ -257,7 +257,7 @@ class AzureSTTProvider(Provider):
             assert self.hass
             response = await self.hass.async_add_executor_job(job)
             
-            _LOGGER.info("inf",response)
+            _LOGGER.info("inf",response,exc_info=1)
             for line in response.iter_lines():
                 if line:
                     # response_json = json.loads(line)
