@@ -251,7 +251,6 @@ class AzureSTTProvider(Provider):
         }
 
         def job():
-            _LOGGER.info(audio_data)
             return requests.post(self._region, headers=headers, data=audio_data, stream=True)
 
         async with async_timeout.timeout(15):
@@ -263,7 +262,7 @@ class AzureSTTProvider(Provider):
                 if line:
                     response_json = json.loads(line)
                     return SpeechResult(
-                        response_json['DisplayText'],
+                        response_json,
                         SpeechResultState.SUCCESS,
                     )
                 else:
