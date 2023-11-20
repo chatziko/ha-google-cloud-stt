@@ -249,22 +249,26 @@ class AzureSTTProvider(Provider):
             'Ocp-Apim-Subscription-Key': self._api_key,
             'Transfer-Encoding': 'chunked'
         }
+        url = "https://" + self._region + ".stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US&format=detailed"
 
         def job():
-            return requests.post(self._region, headers=headers, data=audio_data, stream=True)
+            return requests.post(url, headers=headers, data=audio_data, stream=True)
 
         async with async_timeout.timeout(15):
             assert self.hass
             response = await self.hass.async_add_executor_job(job)
             
-            _LOGGER.error("inf",response,exc_info=1)
+
             for line in response.iter_lines():
                 if line:
-                    # response_json = json.loads(line)
-                    return SpeechResult(
-                        line,
-                        SpeechResultState.SUCCESS,
-                    )
+                    response_json = json.loads(line)
+                    if response_json['RecognitionStatus'] == "Success":
+                        return SpeechResult(
+                            response_json['DisplayText'],
+                            SpeechResultState.SUCCESS,
+                        )
+                    else:
+                        return SpeechResult("",SpeechResultState.ERROR)
                 else:
                     return SpeechResult("",SpeechResultState.ERROR)
             
