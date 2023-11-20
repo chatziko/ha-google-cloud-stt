@@ -246,8 +246,7 @@ class AzureSTTProvider(Provider):
         
         headers = {
             'Content-Type': 'audio/wav',
-            'Ocp-Apim-Subscription-Key': self._api_key,
-            'Transfer-Encoding': 'chunked'
+            'Ocp-Apim-Subscription-Key': self._api_key
         }
         url = "https://" + self._region + ".stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US&format=detailed"
 
