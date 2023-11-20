@@ -4,6 +4,5 @@
   "codeowners": ["@chatziko & @Robert0309"],
   "documentation": "https://github.com/Robert0309/ha-azure-stt",
   "iot_class": "cloud_push",
-  "version": "0.0.1",
-  "requirements": ["azure-cognitiveservices-speech==1.32.1"]
+  "version": "0.0.1"
 }

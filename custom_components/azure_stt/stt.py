@@ -4,8 +4,8 @@ from __future__ import annotations
 import logging
 import os
 from collections.abc import AsyncIterable
-import azure.cognitiveservices.speech as speechsdk
-from azure.cognitiveservices.speech.audio import PushAudioInputStream
+import requests
+import json
 
 import async_timeout
 import voluptuous as vol
@@ -27,6 +27,7 @@ _LOGGER = logging.getLogger(__name__)
 
 CONF_API_KEY = "api_key"
 CONF_REGION = "region"
+
 
 
 SUPPORTED_LANGUAGES = [
@@ -239,32 +240,31 @@ class AzureSTTProvider(Provider):
         self, metadata: SpeechMetadata, stream: AsyncIterable[bytes]
     ) -> SpeechResult:
         # Collect data
-        audio_stream = PushAudioInputStream()
-        async for chunk in stream:
-            audio_stream.write(chunk)
+        async def audio_data_generator():
+            async for chunk in stream:
+                yield chunk
         
-        audio_config = speechsdk.audio.AudioConfig(stream=audio_stream)
-        speech_config  = speechsdk.SpeechConfig(
-            subscription=self._api_key,
-            region=self._region,
-            speech_recognition_language=metadata.language
-        )
+        headers = {
+            'Content-Type': 'audio/wav',
+            'Ocp-Apim-Subscription-Key': self._api_key,
+            'Transfer-Encoding': 'chunked'
+        }
 
         def job():
-            # Create the client on first use, so that it is created inside the executor job
-            if self._client is None:
-                self._client = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
-
-            return self._client.recognize_once_async().get()
+            return requests.post(self._region, headers=headers, data=audio_data_generator(), stream=True)
 
         async with async_timeout.timeout(15):
             assert self.hass
             response = await self.hass.async_add_executor_job(job)
             
-            if response.reason == speechsdk.ResultReason.RecognizedSpeech:
-                return SpeechResult(
-                    response.text,
-                    SpeechResultState.SUCCESS,
-                )
-            else:
-                return SpeechResult("",SpeechResultState.ERROR)
+
+            for line in response.iter_lines():
+                if line:
+                    response_json = json.loads(line)
+                    return SpeechResult(
+                        response_json['DisplayText'],
+                        SpeechResultState.SUCCESS,
+                    )
+                else:
+                    return SpeechResult("",SpeechResultState.ERROR)
+            
