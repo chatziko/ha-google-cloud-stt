@@ -4,5 +4,5 @@
   "codeowners": ["@chatziko & @Robert0309"],
   "documentation": "https://github.com/Robert0309/ha-azure-stt",
   "iot_class": "cloud_push",
-  "version": "0.0.2"
+  "version": "0.0.2.1"
 }

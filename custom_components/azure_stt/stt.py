@@ -240,9 +240,9 @@ class AzureSTTProvider(Provider):
         self, metadata: SpeechMetadata, stream: AsyncIterable[bytes]
     ) -> SpeechResult:
         # Collect data
-        async def audio_data_generator():
-            async for chunk in stream:
-                yield chunk
+        audio_data = b""
+        async for chunk in stream:
+            audio_data += chunk
         
         headers = {
             'Content-Type': 'audio/wav',
@@ -251,7 +251,8 @@ class AzureSTTProvider(Provider):
         }
 
         def job():
-            return requests.post(self._region, headers=headers, data=audio_data_generator(), stream=True)
+            _LOGGER.info(audio_data)
+            return requests.post(self._region, headers=headers, data=audio_data, stream=True)
 
         async with async_timeout.timeout(15):
             assert self.hass
