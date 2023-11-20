@@ -257,12 +257,12 @@ class AzureSTTProvider(Provider):
             assert self.hass
             response = await self.hass.async_add_executor_job(job)
             
-
+            _LOGGER.debug(response)
             for line in response.iter_lines():
                 if line:
                     response_json = json.loads(line)
                     return SpeechResult(
-                        response_json,
+                        line,
                         SpeechResultState.SUCCESS,
                     )
                 else:
