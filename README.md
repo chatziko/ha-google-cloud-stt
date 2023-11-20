@@ -22,7 +22,7 @@ Then install the "Azure Speech-To-Text" integration.
 Azure subscription - [Create one for free](https://azure.microsoft.com/free/cognitive-services).
 [Create a Speech resource](https://portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices) in the Azure portal.
 Your Speech resource key and region. After your Speech resource is deployed, select Go to resource to view and manage keys. For more information about Azure AI services resources, see [Get the keys for your resource](https://learn.microsoft.com/en-us/azure/ai-services/multi-service-resource?pivots=azportal#get-the-keys-for-your-resource).
-Then place the JSON file with the API key you downloaded in the `config` folder, and add the following to your `configuration.yaml`:
+Then add the following to your `configuration.yaml`:
 
 ```yaml
 stt:
