@@ -248,7 +248,7 @@ class AzureSTTProvider(Provider):
             'Content-Type': 'audio/wav',
             'Ocp-Apim-Subscription-Key': self._api_key
         }
-        url = "https://" + self._region + ".stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US&format=detailed"
+        url = f"https://{self._region}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language={metadata.language}&format=detailed"
 
         def job():
             return requests.post(url, headers=headers, data=audio_data, stream=True)
