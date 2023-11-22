@@ -2,10 +2,8 @@
 from __future__ import annotations
 
 import logging
-import os
 from collections.abc import AsyncIterable
-import requests
-import json
+import aiohttp
 
 import async_timeout
 import voluptuous as vol
@@ -198,7 +196,6 @@ class AzureSTTProvider(Provider):
 
     def __init__(self, hass, api_key, region) -> None:
         """Init Azure STT service."""
-        self.hass = hass
         self.name = "Azure STT"
 
 
@@ -239,35 +236,32 @@ class AzureSTTProvider(Provider):
     async def async_process_audio_stream(
         self, metadata: SpeechMetadata, stream: AsyncIterable[bytes]
     ) -> SpeechResult:
-        # Collect data
-        audio_data = b""
-        async for chunk in stream:
-            audio_data += chunk
-        
         headers = {
             'Content-Type': 'audio/wav',
             'Ocp-Apim-Subscription-Key': self._api_key
         }
         url = f"https://{self._region}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language={metadata.language}&format=detailed"
 
-        def job():
-            return requests.post(url, headers=headers, data=audio_data, stream=True)
+        # start the request immediately (before we have all the data), so that
+        # it finishes as early as possible. aiohttp will fetch the data
+        # asynchronously from 'stream' as they arrive and send them to the server.
+        try:
+            async with async_timeout.timeout(15), aiohttp.ClientSession() as session:
+                async with session.post(url, headers=headers, data=stream) as response:
+                    if response.status != 200:
+                        raise Exception(f"azure stt failed status={response.status} response={await response.text()}")
 
-        async with async_timeout.timeout(15):
-            assert self.hass
-            response = await self.hass.async_add_executor_job(job)
-            
+                    response_json = await response.json()
+                    _LOGGER.debug("azure stt returned %s", response_json)
 
-            for line in response.iter_lines():
-                if line:
-                    response_json = json.loads(line)
-                    if response_json['RecognitionStatus'] == "Success":
-                        return SpeechResult(
-                            response_json['DisplayText'],
-                            SpeechResultState.SUCCESS,
-                        )
-                    else:
-                        return SpeechResult("",SpeechResultState.ERROR)
-                else:
-                    return SpeechResult("",SpeechResultState.ERROR)
-            
+                    if response_json['RecognitionStatus'] != "Success":
+                        raise Exception(f"azure stt failed response={response_json}")
+
+                    return SpeechResult(
+                        response_json['DisplayText'],
+                        SpeechResultState.SUCCESS,
+                    )
+        except:
+            _LOGGER.exception("Error running azure stt")
+
+            return SpeechResult("", SpeechResultState.ERROR)
