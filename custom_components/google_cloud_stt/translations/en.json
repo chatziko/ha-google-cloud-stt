@@ -1,0 +1,31 @@
+{
+    "config": {
+      "step": {
+        "user": {
+          "title": "Google Cloud STT",
+          "description": "Enter the path to your Google Cloud Service Account JSON file. Please note that the path is relative to the Home Assistant configuration directory. Guide on how to obtain the service account JSON file can be found [here](https://www.home-assistant.io/integrations/google_cloud#obtaining-an-api-key).",
+          "data": {
+            "file_path": "Configuration file path"
+          }
+        }
+      },
+      "error": {
+        "file_not_found": "The specified service account file does not exist. Please check the path and try again."
+      },
+      "create_entry": {
+        "default": "Google Cloud STT integration has been successfully set up and you can now use it with Assist."
+      }
+    },
+    "options": {
+      "step": {
+        "init": {
+          "title": "Google Cloud STT Options",
+          "description": "Select your preferred model.",
+          "data": {
+            "model": "Model"
+          }
+        }
+      }
+    }
+  }
+  

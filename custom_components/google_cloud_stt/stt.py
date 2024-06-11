@@ -1,33 +1,33 @@
-"""Support for the cloud for speech to text service."""
+"""Support for the Google Cloud speech to text service."""
+
 from __future__ import annotations
 
-import logging
-import os
+import asyncio
 from collections.abc import AsyncIterable
+import os
 
-import async_timeout
-from google.cloud import speech     # Use speech v1. For the moment speech v2 is in preview and has fewer supported languages
-import voluptuous as vol
+from google.cloud import (
+    speech,  # Use speech v1. For the moment speech v2 is in preview and has fewer supported languages
+)
 
+from homeassistant.components import stt
 from homeassistant.components.stt import (
     AudioBitRates,
     AudioChannels,
     AudioCodecs,
     AudioFormats,
     AudioSampleRates,
-    Provider,
     SpeechMetadata,
     SpeechResult,
     SpeechResultState,
 )
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_FILE_PATH, CONF_MODEL
+from homeassistant.core import HomeAssistant
 import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-_LOGGER = logging.getLogger(__name__)
-
-DEFAULT_MODEL = "command_and_search"
-
-CONF_KEY_FILE = "key_file"
-CONF_MODEL = "model"
+from .const import _LOGGER, DEFAULT_MODEL
 
 SUPPORTED_LANGUAGES = [
     "af-ZA",
@@ -167,43 +167,36 @@ SUPPORTED_LANGUAGES = [
     "zu-ZA",
 ]
 
-SUPPORTED_MODELS = [
-    "default",
-    "command_and_search",
-    "latest_short",
-    "latest_long",
-    "phone_call",
-    "video",
-]
 
-MODEL_SCHEMA = vol.In(SUPPORTED_MODELS)
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
+    """Set up Wyoming speech-to-text."""
+    key_file = hass.config.path(
+        str(config_entry.data.get(CONF_FILE_PATH, "googlecloud.json"))
+    )
+    if not os.path.isfile(key_file):
+        _LOGGER.error("File %s doesn't exist", key_file)
+        return None
 
-PLATFORM_SCHEMA = cv.PLATFORM_SCHEMA.extend(
-    {
-        vol.Optional(CONF_KEY_FILE): cv.string,
-        vol.Optional(CONF_MODEL, default=DEFAULT_MODEL): MODEL_SCHEMA,
-    }
-)
-
-
-async def async_get_engine(hass, config, discovery_info=None):
-    """Set up Google Cloud STT component."""
-    if key_file := config.get(CONF_KEY_FILE):
-        key_file = hass.config.path(key_file)
-        if not os.path.isfile(key_file):
-            _LOGGER.error("File %s doesn't exist", key_file)
-            return None
-
-    return GoogleCloudSTTProvider(hass, key_file, config.get(CONF_MODEL))
+    async_add_entities(
+        [
+            GoogleCloudSTTProvider(
+                hass, key_file, config_entry.options.get(CONF_MODEL, DEFAULT_MODEL)
+            ),
+        ]
+    )
 
 
-class GoogleCloudSTTProvider(Provider):
+class GoogleCloudSTTProvider(stt.SpeechToTextEntity):
     """The Google Cloud STT API provider."""
 
     def __init__(self, hass, key_file, model) -> None:
         """Init Google Cloud STT service."""
         self.hass = hass
-        self.name = "Google Cloud STT"
+        self._attr_name = "Google Cloud STT"
 
         self._model = model
         self._key_file = key_file
@@ -242,12 +235,12 @@ class GoogleCloudSTTProvider(Provider):
     async def async_process_audio_stream(
         self, metadata: SpeechMetadata, stream: AsyncIterable[bytes]
     ) -> SpeechResult:
+        """Process an audio stream to STT service."""
         # Collect data
         audio_data = b""
         async for chunk in stream:
             audio_data += chunk
 
-        # """Process an audio stream to STT service."""
         audio = speech.RecognitionAudio(content=audio_data)
         encoding = (
             speech.RecognitionConfig.AudioEncoding.OGG_OPUS
@@ -265,13 +258,15 @@ class GoogleCloudSTTProvider(Provider):
             # Create the client on first use, so that it is created inside the executor job
             if self._client is None:
                 if self._key_file:
-                    self._client = speech.SpeechClient.from_service_account_json(self._key_file)
+                    self._client = speech.SpeechClient.from_service_account_json(
+                        self._key_file
+                    )
                 else:
                     self._client = speech.SpeechClient()
 
             return self._client.recognize(config=config, audio=audio)
 
-        async with async_timeout.timeout(10):
+        async with asyncio.timeout(10):
             assert self.hass
             response = await self.hass.async_add_executor_job(job)
             if response.results and response.results[0].alternatives:

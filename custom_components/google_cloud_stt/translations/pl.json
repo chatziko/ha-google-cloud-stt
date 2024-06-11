@@ -1,0 +1,31 @@
+{
+    "config": {
+      "step": {
+        "user": {
+          "title": "Google Cloud STT",
+          "description": "Wprowadź ścieżkę do pliku JSON z kontem usługi Google Cloud. Pamiętaj, że ścieżka jest względna do katalogu konfiguracji Home Assistant.\n\nInstrukcję jak uzyskać plik JSON z kontem usługi znajdziesz ![tutaj](https://www.home-assistant.io/integrations/google_cloud#obtaining-an-api-key).",
+          "data": {
+            "file_path": "Ścieżka pliku konfiguracyjnego"
+          }
+        }
+      },
+      "error": {
+        "file_not_found": "Określony plik konta usługi nie istnieje. Sprawdź ścieżkę i spróbuj ponownie."
+      },
+      "create_entry": {
+        "default": "Integracja z Google Cloud STT została pomyślnie skonfigurowana i teraz możesz jej używać z Assist."
+      }
+    },
+    "options": {
+      "step": {
+        "init": {
+          "title": "Opcje Google Cloud STT",
+          "description": "Wybierz preferowany model.",
+          "data": {
+            "model": "Model"
+          }
+        }
+      }
+    }
+  }
+  
