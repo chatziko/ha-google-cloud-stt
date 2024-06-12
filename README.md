@@ -10,7 +10,8 @@ This integration allows to use [Google Cloud Speech-to-Text](https://cloud.googl
 
 ## Install
 
-You can install this integration via [HACS](https://hacs.xyz/). Go to HACS / Integrations / Three-dots menu / Custom repositories
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=chatziko&repository=ha-google-cloud-stt&category=integration)
+You can install this integration via [HACS](https://hacs.xyz/). Click on the badge above or go to HACS / Integrations / Three-dots menu / Custom repositories
 and add:
 - Repository: `https://github.com/chatziko/ha-google-cloud-stt`
 - Category: Integration
@@ -22,17 +23,14 @@ Then install the "Google Cloud Speech-To-Text" integration.
 
 To use it you need to configure a Google Cloud project, following the same instructions as the
 [Google Cloud Text-to-Speach](https://www.home-assistant.io/integrations/google_cloud) integration.
-Then place the JSON file with the API key you downloaded in the `config` folder, and add the following to your `configuration.yaml`:
+Then place the JSON file with the API key you downloaded in the `config` folder.
 
-```yaml
-stt:
-  - platform: google_cloud_stt
-    key_file: googlecloud.json
-    model: command_and_search
-```
+Next add the integration to your Home Assistant instance.
+
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=google_cloud_stt)
 
 After enabling the integration, you can configure a [Voice Assistant](https://www.home-assistant.io/blog/2023/04/27/year-of-the-voice-chapter-2/#composing-voice-assistants)
-to use it by selecting `google_cloud_stt` in the "Speech-to-text" option.
+to use it by selecting `Google Cloud` in the "Speech-to-text" option.
 
 The supported languages are listed [here](https://cloud.google.com/speech-to-text/docs/speech-to-text-supported-languages).
 Note that V1 of Google Cloud Speech-to-Text is used (it is available in more languages and has a free tier).
@@ -41,15 +39,6 @@ is `command_and_search`, since it is available in most languages and should perf
 
 
 ## FAQ
-
-#### I get the following error in the Home Assistant system log
-
-  ```
-  The stt integration does not support any configuration parameters, got [{'platform': 'google_cloud_stt', 'key_file': 'google-cloud-service-googlecloud.json', 'model': 'command_and_search'}]. Please remove the configuration parameters from your configuration.
-  ```
-
-This is a known issue due to a [bug](https://github.com/home-assistant/core/issues/97161) in Home Assistant >= 2023.7. However, the reported message
-does __not__ affect the functionality of this integration, it should still work as expected (if properly configured).
 
 #### How much does it cost to use Google Cloud Speech-To-Text?
 

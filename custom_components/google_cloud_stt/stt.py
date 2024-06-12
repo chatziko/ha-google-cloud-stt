@@ -21,13 +21,14 @@ from homeassistant.components.stt import (
     SpeechResult,
     SpeechResultState,
 )
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import CONF_FILE_PATH, CONF_MODEL
-from homeassistant.core import HomeAssistant
-import homeassistant.helpers.config_validation as cv
+from homeassistant.core import DOMAIN as HOMEASSISTANT_DOMAIN, HomeAssistant
+from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
 
-from .const import _LOGGER, DEFAULT_MODEL
+from .const import _LOGGER, DEFAULT_MODEL, DOMAIN
 
 SUPPORTED_LANGUAGES = [
     "af-ZA",
@@ -173,7 +174,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up Wyoming speech-to-text."""
+    """Set up Google Cloud speech-to-text."""
     key_file = hass.config.path(
         str(config_entry.data.get(CONF_FILE_PATH, "googlecloud.json"))
     )
@@ -190,13 +191,49 @@ async def async_setup_entry(
     )
 
 
+async def async_get_engine(hass, config, discovery_info=None):
+    """Initialize Google Cloud STT import config."""
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": SOURCE_IMPORT}, data=config
+    )
+    if (
+        result["type"] == FlowResultType.CREATE_ENTRY
+        or result["reason"] == "single_instance_allowed"
+    ):
+        async_create_issue(
+            hass,
+            HOMEASSISTANT_DOMAIN,
+            f"deprecated_yaml_{DOMAIN}",
+            is_fixable=False,
+            severity=IssueSeverity.WARNING,
+            translation_key="deprecated_yaml",
+            translation_placeholders={
+                "domain": DOMAIN,
+                "integration_title": "Google Cloud Speech-to-Text",
+            },
+        )
+    else:
+        async_create_issue(
+            hass,
+            DOMAIN,
+            f"deprecated_yaml_import_issue_{result['reason']}",
+            is_fixable=False,
+            issue_domain=DOMAIN,
+            severity=IssueSeverity.ERROR,
+            translation_key=f"deprecated_yaml_import_issue_{result['reason']}",
+            learn_more_url=f"/config/integrations/dashboard/add?domain={DOMAIN}",
+        )
+
+
 class GoogleCloudSTTProvider(stt.SpeechToTextEntity):
     """The Google Cloud STT API provider."""
+
+    _attr_name = "Google Cloud"
+    _attr_unique_id = "google-cloud-speech-to-text"
 
     def __init__(self, hass, key_file, model) -> None:
         """Init Google Cloud STT service."""
         self.hass = hass
-        self._attr_name = "Google Cloud STT"
 
         self._model = model
         self._key_file = key_file

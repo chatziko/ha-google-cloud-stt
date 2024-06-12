@@ -12,7 +12,7 @@ from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResu
 from homeassistant.const import CONF_FILE_PATH, CONF_MODEL
 from homeassistant.core import callback
 
-from .const import DEFAULT_MODEL, DOMAIN, SUPPORTED_MODELS
+from .const import _LOGGER, DEFAULT_MODEL, DOMAIN, SUPPORTED_MODELS
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
@@ -59,6 +59,21 @@ class GoogleCloudConfigFlow(ConfigFlow, domain=DOMAIN):
     ) -> config_entries.OptionsFlow:
         """Create the options flow."""
         return GoogleCloudOptionsFlowHandler(config_entry)
+
+    async def async_step_import(self, import_data: dict[str, Any]) -> ConfigFlowResult:
+        """Import Google Cloud STT configuration from YAML."""
+
+        if not os.path.isfile(self.hass.config.path(import_data["key_file"])):
+            _LOGGER.error("File %s doesn't exist", import_data["key_file"])
+            return self.async_abort(reason="file_not_found")
+
+        return self.async_create_entry(
+            title="Google Cloud STT",
+            data={CONF_FILE_PATH: import_data["key_file"]},
+            options={
+                CONF_MODEL: import_data.get(CONF_MODEL, DEFAULT_MODEL),
+            },
+        )
 
 
 class GoogleCloudOptionsFlowHandler(config_entries.OptionsFlow):
