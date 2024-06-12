@@ -11,6 +11,7 @@ This integration allows to use [Google Cloud Speech-to-Text](https://cloud.googl
 ## Install
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=chatziko&repository=ha-google-cloud-stt&category=integration)
+
 You can install this integration via [HACS](https://hacs.xyz/). Click on the badge above or go to HACS / Integrations / Three-dots menu / Custom repositories
 and add:
 - Repository: `https://github.com/chatziko/ha-google-cloud-stt`
