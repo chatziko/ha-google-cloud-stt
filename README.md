@@ -23,7 +23,7 @@ Then install the "Google Cloud Speech-To-Text" integration.
 ## Configure
 
 To use it you need to configure a Google Cloud project, following the same instructions as the
-[Google Cloud Text-to-Speach](https://www.home-assistant.io/integrations/google_cloud) integration.
+[Google Cloud Text-to-Speech](https://www.home-assistant.io/integrations/google_cloud) integration.
 Then place the JSON file with the API key you downloaded in the `config` folder.
 
 Next add the integration to your Home Assistant instance.
