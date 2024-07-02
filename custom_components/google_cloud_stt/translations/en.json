@@ -3,9 +3,9 @@
     "step": {
       "user": {
         "title": "Google Cloud STT",
-        "description": "Enter the path to your Google Cloud Service Account JSON file. Please note that the path is relative to the Home Assistant configuration directory. Guide on how to obtain the service account JSON file can be found [here](https://www.home-assistant.io/integrations/google_cloud#obtaining-an-api-key).",
+        "description": "Upload your Google Cloud Service Account JSON file. Guide on how to obtain the service account JSON file can be found [here](https://www.home-assistant.io/integrations/google_cloud#obtaining-an-api-key).",
         "data": {
-          "file_path": "Configuration file path"
+          "uploaded_file": "Upload Service Account File"
         }
       }
     },

@@ -3,9 +3,9 @@
     "step": {
       "user": {
         "title": "Google Cloud STT",
-        "description": "Wprowadź ścieżkę do pliku JSON z kontem usługi Google Cloud. Pamiętaj, że ścieżka jest względna do katalogu konfiguracji Home Assistant.\n\nInstrukcję jak uzyskać plik JSON z kontem usługi znajdziesz ![tutaj](https://www.home-assistant.io/integrations/google_cloud#obtaining-an-api-key).",
+        "description": "Wgraj plik JSON z kontem usługi Google Cloud. Instrukcję jak uzyskać plik JSON z kontem usługi znajdziesz ![tutaj](https://www.home-assistant.io/integrations/google_cloud#obtaining-an-api-key).",
         "data": {
-          "file_path": "Ścieżka pliku konfiguracyjnego"
+          "uploaded_file": "Wgraj plik konta usługi"
         }
       }
     },

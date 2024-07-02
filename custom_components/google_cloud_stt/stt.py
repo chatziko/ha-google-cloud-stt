@@ -28,7 +28,7 @@ from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.issue_registry import IssueSeverity, async_create_issue
 
-from .const import _LOGGER, DEFAULT_MODEL, DOMAIN
+from .const import _LOGGER, DEFAULT_MODEL, DOMAIN, SERVICE_ACCOUNT_INFO
 
 SUPPORTED_LANGUAGES = [
     "af-ZA",
@@ -175,17 +175,11 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up Google Cloud speech-to-text."""
-    key_file = hass.config.path(
-        str(config_entry.data.get(CONF_FILE_PATH, "googlecloud.json"))
-    )
-    if not os.path.isfile(key_file):
-        _LOGGER.error("File %s doesn't exist", key_file)
-        return None
 
     async_add_entities(
         [
             GoogleCloudSTTProvider(
-                hass, key_file, config_entry.options.get(CONF_MODEL, DEFAULT_MODEL)
+                hass, config_entry.data[SERVICE_ACCOUNT_INFO], config_entry.options.get(CONF_MODEL, DEFAULT_MODEL)
             ),
         ]
     )
@@ -231,12 +225,12 @@ class GoogleCloudSTTProvider(stt.SpeechToTextEntity):
     _attr_name = "Google Cloud"
     _attr_unique_id = "google-cloud-speech-to-text"
 
-    def __init__(self, hass, key_file, model) -> None:
+    def __init__(self, hass, service_account_info, model) -> None:
         """Init Google Cloud STT service."""
         self.hass = hass
 
         self._model = model
-        self._key_file = key_file
+        self._service_account_info = service_account_info
         self._client = None
 
     @property
@@ -294,12 +288,7 @@ class GoogleCloudSTTProvider(stt.SpeechToTextEntity):
         def job():
             # Create the client on first use, so that it is created inside the executor job
             if self._client is None:
-                if self._key_file:
-                    self._client = speech.SpeechClient.from_service_account_json(
-                        self._key_file
-                    )
-                else:
-                    self._client = speech.SpeechClient()
+                self._client = speech.SpeechClient.from_service_account_info(self._service_account_info)
 
             return self._client.recognize(config=config, audio=audio)
 
@@ -311,4 +300,4 @@ class GoogleCloudSTTProvider(stt.SpeechToTextEntity):
                     response.results[0].alternatives[0].transcript,
                     SpeechResultState.SUCCESS,
                 )
-            return SpeechResult("", SpeechResultState.ERROR)
+            return SpeechResult(None, SpeechResultState.ERROR)
