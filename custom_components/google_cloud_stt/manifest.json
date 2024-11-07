@@ -5,7 +5,7 @@
   "documentation": "https://github.com/chatziko/ha-google-cloud-stt",
   "issue_tracker": "https://github.com/chatziko/ha-google-cloud-stt/issues",
   "iot_class": "cloud_push",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "requirements": ["google-cloud-speech"],
   "config_flow": true,
   "single_config_entry": true,
