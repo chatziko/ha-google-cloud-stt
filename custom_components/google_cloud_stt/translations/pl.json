@@ -1,0 +1,36 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Google Cloud STT",
+        "description": "Wgraj plik JSON z kontem usługi Google Cloud. Instrukcję jak uzyskać plik JSON z kontem usługi znajdziesz ![tutaj](https://www.home-assistant.io/integrations/google_cloud#obtaining-an-api-key).",
+        "data": {
+          "uploaded_file": "Wgraj plik konta usługi"
+        }
+      }
+    },
+    "error": {
+      "file_not_found": "Określony plik konta usługi nie istnieje. Sprawdź ścieżkę i spróbuj ponownie."
+    },
+    "create_entry": {
+      "default": "Integracja z Google Cloud STT została pomyślnie skonfigurowana i teraz możesz jej używać z Assist."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opcje Google Cloud STT",
+        "description": "Wybierz preferowany model.",
+        "data": {
+          "model": "Model"
+        }
+      }
+    }
+  },
+  "issues": {
+    "deprecated_yaml_import_issue_file_not_found": {
+      "title": "Integracja Google Cloud STT nie może być zaimportowana",
+      "description": "Nie można zaimportować integracji Google Cloud STT, ponieważ określony plik konta usługi nie istnieje. Sprawdź ścieżkę i dodaj integrację za pomocą interfejsu użytkownika."
+    }
+  }
+}
